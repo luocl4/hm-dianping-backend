@@ -4,7 +4,8 @@ public class RedisConstants {
     //    存在redis里面的验证码的相关常量
     public static final String LOGIN_CODE_KEY = "login:code:";
     public static final Long LOGIN_CODE_TTL = 2L;
-
+    
+    //    存在redis里面的用户登录信息的的相关常量
     public static final String LOGIN_USER_KEY = "login:token:";
     public static final Long LOGIN_USER_TTL = 36000L;
 

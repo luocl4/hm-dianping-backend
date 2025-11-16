@@ -1,14 +1,23 @@
 package com.hmdp.service.impl;
 
+import cn.hutool.core.bean.BeanUtil;
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.hmdp.dto.Result;
 import com.hmdp.entity.Shop;
 import com.hmdp.mapper.ShopMapper;
 import com.hmdp.service.IShopService;
-import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
+
+import java.util.HashMap;
+import java.util.Map;
+
+import static com.hmdp.utils.RedisConstants.CACHE_SHOP_KEY;
 
 /**
  * <p>
- *  服务实现类
+ * 服务实现类
  * </p>
  *
  * @author 虎哥
@@ -16,5 +25,48 @@ import org.springframework.stereotype.Service;
  */
 @Service
 public class ShopServiceImpl extends ServiceImpl<ShopMapper, Shop> implements IShopService {
+    @Autowired
+    private StringRedisTemplate stringRedisTemplate;
 
+    /**
+     * 根据id查询商铺信息
+     *
+     * @param id 商铺id
+     * @return 商铺详情数据
+     */
+    @Override
+    public Result queryShopById(Long id) {
+//        1.从redis查询商铺缓存的商铺信息
+        Map<Object, Object> shopMap = stringRedisTemplate.opsForHash().entries(CACHE_SHOP_KEY + id);
+        Shop shop = new Shop();
+        if (!shopMap.isEmpty()) {
+//            2.如果有缓存的商铺信息，则转map类型为Shop类型后返回，用到hutool工具的fillBeanWithMap
+            shop = BeanUtil.fillBeanWithMap(shopMap, new Shop(), false);
+            return Result.ok(shop);
+        }
+//        3.redis没有缓存的话，去查数据库,用到mybatis-plus的写法
+        shop = getById(id);
+//        4.判断数据库中能否正确查出来
+        if (shop == null) return Result.fail("店铺不存在");
+        else {  //能查出来就，把信息放入redis并返回前端
+            shopMap = new HashMap<>();
+            shopMap.put("id", shop.getId().toString());
+            shopMap.put("name", shop.getName());
+            shopMap.put("typeId", shop.getTypeId().toString());
+            shopMap.put("images", shop.getImages());
+            shopMap.put("area", shop.getArea());
+            shopMap.put("address", shop.getAddress());
+            shopMap.put("x", shop.getX().toString());
+            shopMap.put("y", shop.getY().toString());
+            shopMap.put("avgPrice", shop.getAvgPrice().toString());
+            shopMap.put("sold", shop.getSold().toString());
+            shopMap.put("comments", shop.getComments().toString());
+            shopMap.put("score", shop.getScore().toString());
+            shopMap.put("openHours", shop.getOpenHours().toString());
+            shopMap.put("createTime", shop.getCreateTime().toString());
+            shopMap.put("updateTime", shop.getUpdateTime().toString());
+            stringRedisTemplate.opsForHash().putAll(CACHE_SHOP_KEY + id, shopMap);
+            return Result.ok(shop);
+        }
+    }
 }

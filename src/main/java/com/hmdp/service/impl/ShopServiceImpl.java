@@ -9,6 +9,7 @@ import com.hmdp.service.IShopService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -71,5 +72,23 @@ public class ShopServiceImpl extends ServiceImpl<ShopMapper, Shop> implements IS
             stringRedisTemplate.expire(CACHE_SHOP_KEY + id, CACHE_SHOP_TTL, TimeUnit.MINUTES);
             return Result.ok(shop);
         }
+    }
+
+    /**
+     * 更新商铺信息
+     *
+     * @param shop 商铺数据
+     * @return 无
+     */
+    @Override
+    @Transactional
+    public Result updateShop(Shop shop) {
+        Long id = shop.getId();
+        if (id == null) {
+            return Result.fail("店铺id不能为空");
+        }
+        updateById(shop);  // 用到mybatis-plus的https://baomidou.com/guides/data-interface/#update-1
+        stringRedisTemplate.delete(CACHE_SHOP_KEY + shop.getId());  //更新数据库后删除redis缓存，确保mysql和redis的一致性，见笔记redis 3.1缓存更新策略
+        return Result.ok();
     }
 }

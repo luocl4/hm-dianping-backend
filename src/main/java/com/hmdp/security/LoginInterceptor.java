@@ -37,7 +37,7 @@ public class LoginInterceptor implements HandlerInterceptor {
 //    private StringRedisTemplate stringRedisTemplate;
 //
 //    public LoginInterceptor(StringRedisTemplate stringRedisTemplate) {
-//        this.stringRedisTemplate = stringRedisTemplate;
+//        this.stringRedisTemplate = stringRedisTemplate;  //@Component 注解的东西里面要自己写构造函数，才能用StringRedisTemplate
 //    }
 //
 //    //    ②改为使用redis的写法

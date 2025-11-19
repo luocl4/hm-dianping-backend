@@ -19,7 +19,7 @@ public class RefreshTokenInterceptor implements HandlerInterceptor {
     private StringRedisTemplate stringRedisTemplate;
 
     public RefreshTokenInterceptor(StringRedisTemplate stringRedisTemplate) {
-        this.stringRedisTemplate = stringRedisTemplate;
+        this.stringRedisTemplate = stringRedisTemplate;  //@Component 注解的东西里面要自己写构造函数，才能用StringRedisTemplate
     }
 
     //    改为使用redis的写法

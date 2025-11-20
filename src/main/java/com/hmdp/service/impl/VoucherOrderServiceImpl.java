@@ -55,9 +55,13 @@ public class VoucherOrderServiceImpl extends ServiceImpl<VoucherOrderMapper, Vou
         if (voucher.getStock() < 1) {
             return Result.fail("库存不足");
         }
-//        5.扣减库存，相当于 UPDATE seckill_voucher SET stock = stock - 1 WHERE voucher_id = #{voucherId};
+//        5.扣减库存，相当于
 //        用到mybatis-plus的https://baomidou.com/guides/data-interface/#%E4%BD%BF%E7%94%A8%E6%AD%A5%E9%AA%A4的update
-        boolean success = seckillVoucherService.update().setSql("stock = stock - 1").eq("voucher_id", voucherId).update();
+//        普通的乐观锁，是 UPDATE seckill_voucher SET stock = stock - 1 WHERE voucher_id = #{voucherId} and stock = #{voucher.getStock()}；
+//        这样会让成功率非常低，在我们这里可以改成 UPDATE seckill_voucher SET stock = stock - 1 WHERE voucher_id = #{voucherId} and stock > 0;
+//        不强制要求相等，而是有就可以买
+        boolean success = seckillVoucherService.update().setSql("stock = stock - 1").eq("voucher_id", voucherId)
+                .gt("stock", 0).update();
         if (!success) {
             return Result.fail("库存不足");
         }

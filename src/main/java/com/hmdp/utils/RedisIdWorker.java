@@ -9,7 +9,7 @@ import java.time.format.DateTimeFormatter;
 @Component
 public class RedisIdWorker {
     // 自定义起始时间戳：2025-01-01 00:00:00 UTC；如果不自定义直接用的话，数值会很大，然后转成二进制就会超出31位
-    private static final long START_TIMESTAMP = 1735689600000L;
+    private static final long START_TIMESTAMP = 17356896000L;
     //    左移的位数，32位
     private static final int SEQUENCE_BITS = 32;
 
@@ -27,7 +27,7 @@ public class RedisIdWorker {
      */
     public long nextId(String keyPrefix) {
 //        1.生成时间戳
-        long timestamp = System.currentTimeMillis();  //这个函数得到的是，从1970 年 1 月 1 日 00:00:00 UTC开始的ms数
+        long timestamp = System.currentTimeMillis() / 1000;  //这个函数得到的是，从1970 年 1 月 1 日 00:00:00 UTC开始的秒数
 //        2.生成序列号（Redis自增，原子操作，避免并发冲突）
 //        Redis key：比如 "order:id:20251119"（按日期拆分，方便后续清理）；一天一个新的key
         String date = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd"));

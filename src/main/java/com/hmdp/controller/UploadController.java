@@ -2,8 +2,8 @@ package com.hmdp.controller;
 
 import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.util.StrUtil;
+import com.hmdp.constant.SystemConstants;
 import com.hmdp.dto.Result;
-import com.hmdp.utils.SystemConstants;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -34,16 +34,6 @@ public class UploadController {
         }
     }
 
-    @GetMapping("/blog/delete")
-    public Result deleteBlogImg(@RequestParam("name") String filename) {
-        File file = new File(SystemConstants.IMAGE_UPLOAD_DIR, filename);
-        if (file.isDirectory()) {
-            return Result.fail("错误的文件名称");
-        }
-        FileUtil.del(file);
-        return Result.ok();
-    }
-
     private String createNewFileName(String originalFilename) {
         // 获取后缀
         String suffix = StrUtil.subAfter(originalFilename, ".", true);
@@ -59,5 +49,15 @@ public class UploadController {
         }
         // 生成文件名
         return StrUtil.format("/blogs/{}/{}/{}.{}", d1, d2, name, suffix);
+    }
+
+    @GetMapping("/blog/delete")
+    public Result deleteBlogImg(@RequestParam("name") String filename) {
+        File file = new File(SystemConstants.IMAGE_UPLOAD_DIR, filename);
+        if (file.isDirectory()) {
+            return Result.fail("错误的文件名称");
+        }
+        FileUtil.del(file);
+        return Result.ok();
     }
 }

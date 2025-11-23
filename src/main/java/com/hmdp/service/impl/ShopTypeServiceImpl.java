@@ -14,8 +14,8 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
-import static com.hmdp.utils.RedisConstants.CACHE_SHOP_TYPE_KEY;
-import static com.hmdp.utils.RedisConstants.CACHE_SHOP_TYPE_TTL;
+import static com.hmdp.constant.RedisConstants.CACHE_SHOP_TYPE_KEY;
+import static com.hmdp.constant.RedisConstants.CACHE_SHOP_TYPE_TTL;
 
 /**
  * <p>

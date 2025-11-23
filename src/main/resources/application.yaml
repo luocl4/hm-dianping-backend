@@ -18,6 +18,24 @@ spring:
         max-idle: 10
         min-idle: 1
         time-between-eviction-runs: 10s
+    # RabbitMQ配置
+  rabbitmq:
+    host: 127.0.0.1  # 你的RabbitMQ服务器地址
+    port: 5672       # 默认端口
+    username: guest  # 默认用户名
+    password: guest  # 默认密码
+    virtual-host: /  # 默认虚拟主机
+    # 消费者配置
+    listener:
+      simple:
+        prefetch: 1  # 限流，每次只处理1条消息，防止超负载
+        concurrency: 5  # 消费者线程数
+        max-concurrency: 10  # 最大消费者线程数
+        retry:
+          enabled: true  # 开启重试
+          max-attempts: 3  # 最大重试次数
+          initial-interval: 1000ms  # 首次重试间隔
+          multiplier: 2  # 重试间隔倍数（1s, 2s, 4s...）
   jackson:
     default-property-inclusion: non_null # JSON序列化的时候，碰到null值就忽略
 mybatis-plus:

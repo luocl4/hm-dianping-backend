@@ -1,4 +1,4 @@
-package com.hmdp.utils;
+package com.hmdp.constant;
 
 public class RedisConstants {
     //    存在redis里面的验证码的相关常量
@@ -25,7 +25,7 @@ public class RedisConstants {
 
     //    异步秒杀优化的相关常量
     public static final String SECKILL_STOCK_KEY = "seckill:stock:";
-    
+
     public static final String BLOG_LIKED_KEY = "blog:liked:";
     public static final String FEED_KEY = "feed:";
     public static final String SHOP_GEO_KEY = "shop:geo:";

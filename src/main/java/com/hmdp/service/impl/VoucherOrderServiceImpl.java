@@ -2,6 +2,7 @@ package com.hmdp.service.impl;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.hmdp.dto.Result;
+import com.hmdp.dto.SeckillOrderMessage;
 import com.hmdp.entity.SeckillVoucher;
 import com.hmdp.entity.VoucherOrder;
 import com.hmdp.mapper.VoucherOrderMapper;
@@ -9,6 +10,7 @@ import com.hmdp.service.ISeckillVoucherService;
 import com.hmdp.service.IVoucherOrderService;
 import com.hmdp.utils.RedisIdWorker;
 import com.hmdp.utils.UserHolder;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.aop.framework.AopContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
@@ -19,6 +21,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.Collections;
+
+import static com.hmdp.constant.MqConstants.SECKILL_ORDER_EXCHANGE;
+import static com.hmdp.constant.MqConstants.SECKILL_ORDER_ROUTING_KEY;
 
 /**
  * <p>
@@ -48,6 +53,9 @@ public class VoucherOrderServiceImpl extends ServiceImpl<VoucherOrderMapper, Vou
     private RedisIdWorker redisIdWorker;
     @Autowired
     private StringRedisTemplate stringRedisTemplate;
+    // 注入RabbitTemplate用于发送消息
+    @Autowired
+    private RabbitTemplate rabbitTemplate;
 
     /**
      * 秒杀券下单
@@ -150,11 +158,18 @@ public class VoucherOrderServiceImpl extends ServiceImpl<VoucherOrderMapper, Vou
         int r = result.intValue();
 //        3.1.不为0,代表没有购买资格
         if (r != 0) {
-            return Result.fail(r == 1 ? "库存不足" : "不能重复下单");
+            return Result.fail(r == 1 ? "秒杀券库存不足" : "该用户已经购买过该秒杀券");
         }
 //        3.2.为0,有购买资格,把下单信息保存到阻塞队列
+        // 生成订单ID，创建消息对象
         long orderId = redisIdWorker.nextId("order");
-//        TODO:保存到阻塞队列
+        SeckillOrderMessage orderMessage = new SeckillOrderMessage(orderId, userId, voucherId); //全参构造
+        // 发送消息到RabbitMQ队列（异步创建订单），direct类型
+        rabbitTemplate.convertAndSend(
+                SECKILL_ORDER_EXCHANGE,
+                SECKILL_ORDER_ROUTING_KEY,
+                orderMessage
+        );
 //        4.返回订单id
         return Result.ok(orderId);
     }

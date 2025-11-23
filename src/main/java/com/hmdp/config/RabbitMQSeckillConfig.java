@@ -18,8 +18,6 @@ public class RabbitMQSeckillConfig {
     @Bean
     public Queue seckillOrderQueue() {
         return QueueBuilder.durable(SECKILL_ORDER_QUEUE)
-                .deadLetterExchange(SECKILL_ORDER_EXCHANGE + ".dlx") // 死信交换机（可选，处理失败订单）
-                .deadLetterRoutingKey(SECKILL_ORDER_ROUTING_KEY + ".dlx")
                 .build();
     }
 
@@ -42,5 +40,5 @@ public class RabbitMQSeckillConfig {
                 .to(seckillOrderExchange)
                 .with(SECKILL_ORDER_ROUTING_KEY);
     }
-    
+
 }

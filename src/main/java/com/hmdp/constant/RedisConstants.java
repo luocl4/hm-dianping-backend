@@ -26,7 +26,9 @@ public class RedisConstants {
     //    异步秒杀优化的相关常量
     public static final String SECKILL_STOCK_KEY = "seckill:stock:";
 
+    //    博客点赞相关常量
     public static final String BLOG_LIKED_KEY = "blog:liked:";
+    
     public static final String FEED_KEY = "feed:";
     public static final String SHOP_GEO_KEY = "shop:geo:";
     public static final String USER_SIGN_KEY = "sign:";

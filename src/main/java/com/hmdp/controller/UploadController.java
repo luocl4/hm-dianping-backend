@@ -5,6 +5,7 @@ import cn.hutool.core.util.StrUtil;
 import com.hmdp.constant.SystemConstants;
 import com.hmdp.dto.Result;
 import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -15,11 +16,12 @@ import java.util.UUID;
 
 @Slf4j
 @RestController
-@RequestMapping("upload")
-@Api(tags = "上传文件oss相关接口，未完成")
+@RequestMapping("/upload")
+@Api(tags = "上传文件oss相关接口")
 public class UploadController {
 
     @PostMapping("blog")
+    @ApiOperation("上传图片，这里是存放在本地IMAGE_UPLOAD_DIR")
     public Result uploadImage(@RequestParam("file") MultipartFile image) {
         try {
             // 获取原始文件名称
@@ -60,6 +62,7 @@ public class UploadController {
             return Result.fail("错误的文件名称");
         }
         FileUtil.del(file);
+        log.debug("文件删除成功，{}", filename);
         return Result.ok();
     }
 }

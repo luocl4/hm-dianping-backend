@@ -15,6 +15,8 @@ import org.springframework.web.bind.annotation.*;
 import javax.annotation.Resource;
 import java.util.List;
 
+import static com.hmdp.constant.SystemConstants.MAX_PAGE_SIZE;
+
 /**
  * <p>
  * 前端控制器
@@ -76,5 +78,19 @@ public class BlogController {
     @ApiOperation("查询点赞这篇博客的top5用户")
     public Result queryBloglikes(@PathVariable("id") Long id) {
         return blogService.queryBloglikes(id);
+    }
+
+    // BlogController
+    @GetMapping("/of/user")
+    @ApiOperation("根据用户id查询博客")
+    public Result queryBlogByUserId(
+            @RequestParam(value = "current", defaultValue = "1") Integer current,
+            @RequestParam("id") Long id) {
+        // 根据用户查询
+        Page<Blog> page = blogService.query()
+                .eq("user_id", id).page(new Page<>(current, MAX_PAGE_SIZE));
+        // 获取当前页数据
+        List<Blog> records = page.getRecords();
+        return Result.ok(records);
     }
 }
